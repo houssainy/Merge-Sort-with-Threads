@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include <limits>
+#include<fstream>
+#include <iostream>
+#include <stdlib.h>
+
 
 using namespace std;
 
@@ -7,15 +11,38 @@ void merge_sort(int * a , int startPos, int endPos);
 void _merge( int *a , int startPos , int mid , int endPos);
 
 int main(){
-    int a[] = {8,7,9,5,4};
+
+    //*********Start Read File*************
+    ifstream myReadFile;
+    myReadFile.open("input.txt");
+    string myString;
+
+    //Number of elements in the file
+    if (myReadFile.is_open())
+        getline(myReadFile,myString);
+
+    int n = atoi(myString.c_str());
+    int a[n];
+
+    if (myReadFile.is_open()) {
+        int pos = 0;
+        while (!myReadFile.eof()) {
+            getline(myReadFile,myString , ',');
+            a[pos++] = atoi(myString.c_str());
+        }
+    }
+
+    myReadFile.close();
+    //*************** End Reading of file ************
+
     int array_length = sizeof(a)/sizeof(a[0]);
 
     merge_sort(a,0, array_length-1);
 
     //Print Values
-    for(int i = 0 ; i < array_length ; i++ ){
+    for(int i = 0 ; i < array_length ; i++ )
         printf("%i",a[i]);
-    }
+
     return 0;
 }
 
@@ -48,8 +75,10 @@ void _merge( int *a , int startPos , int mid , int endPos){
     for(int i = 0 ; i < n2 ; i++)
         R[i] = a[i+mid+1];
 
+    //Set last Elements in the Right and Left arrays Infinity.
     L[n1] = std::numeric_limits<int>::max();
     R[n2] = std::numeric_limits<int>::max();
+
     //Merge procedure
     int i = 0;
     int j = 0;

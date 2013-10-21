@@ -1,9 +1,17 @@
 #include <stdio.h>
 #include <limits>
 #include<fstream>
-#include <iostream>
 #include <stdlib.h>
 
+/**
+* Author: Mohamed El-Houssainy
+* Subject: OS Lab2
+* Date: 21/10/2013
+*
+* About: Merge sort implementation using Threads
+* Refrences:
+* Threads-> http://www.yolinux.com/TUTORIALS/LinuxTutorialPosixThreads.html
+*/
 
 using namespace std;
 
@@ -40,8 +48,12 @@ int main(){
     merge_sort(a,0, array_length-1);
 
     //Print Values
-    for(int i = 0 ; i < array_length ; i++ )
-        printf("%i",a[i]);
+    for(int i = 0 ; i < array_length ; i++ ){
+        if(i!= array_length-1)
+            printf("%i,",a[i]);
+        else
+            printf("%i",a[i]);
+    }
 
     return 0;
 }

@@ -15,8 +15,15 @@
 
 using namespace std;
 
-void merge_sort(int * a , int startPos, int endPos);
+void *merge_sort(void *ptr);
 void _merge( int *a , int startPos , int mid , int endPos);
+
+struct merge_sort_args{
+    int *a;
+    int startPos;
+    int endPos;
+};
+
 
 int main(){
 
@@ -45,7 +52,13 @@ int main(){
 
     int array_length = sizeof(a)/sizeof(a[0]);
 
-    merge_sort(a,0, array_length-1);
+    merge_sort_args *args = new merge_sort_args();
+    args->a = a;
+    args->startPos = 0;
+    args->endPos = array_length-1;
+
+    //merge_sort(a,0, array_length-1);
+    merge_sort(args);
 
     //Print Values
     for(int i = 0 ; i < array_length ; i++ ){
@@ -61,12 +74,44 @@ int main(){
 /**
 *   Mergo Sort Algorithm.
 */
-void merge_sort(int * a , int startPos, int endPos ) {
-	if( endPos - startPos +1 > 1  ) {
-		int mid = (startPos+endPos) / 2;
-		merge_sort( a , startPos, mid);
-		merge_sort( a , mid + 1 , endPos);
-		_merge(a , startPos , mid ,endPos);
+void *merge_sort(void* ptr ) {
+
+    merge_sort_args *args = (merge_sort_args*)ptr;
+
+	if( args->endPos - args->startPos +1 > 1  ) {
+		int mid = (args->startPos+args->endPos) / 2;
+
+
+		/***************** Starting of Thread One*********************/
+        pthread_t thread1;
+
+        merge_sort_args *new_args1 = new merge_sort_args();
+        new_args1->a = args->a;
+        new_args1->startPos = args->startPos;
+        new_args1->endPos = mid;
+
+        pthread_create( &thread1, NULL, merge_sort, (void*) new_args1);
+		//merge_sort( a , startPos, mid);
+		/*****************End of Thread One*********************/
+
+		/***************** Starting of Thread Two *********************/
+        pthread_t thread2;
+
+        merge_sort_args *new_args2 = new merge_sort_args();
+        new_args2->a = args->a;
+        new_args2->startPos = mid+1;
+        new_args2->endPos = args->endPos;
+
+		pthread_create( &thread2, NULL, merge_sort, (void*) new_args2);
+		//merge_sort( a , mid + 1 , endPos);
+
+		/*****************End of Thread Two *********************/
+		//Wait till the two threads finish their work
+        pthread_join( thread1, NULL);
+        pthread_join( thread2, NULL);
+
+        //Merge the results
+		_merge(args->a , args->startPos , mid ,args->endPos);
     }
 }
 

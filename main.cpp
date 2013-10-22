@@ -24,10 +24,11 @@ struct merge_sort_args{
     int endPos;
 };
 
-
+int thread_count;
 int main(){
 
     //*********Start Read File*************
+    thread_count = 1;
     ifstream myReadFile;
     myReadFile.open("input.txt");
     string myString;
@@ -83,33 +84,49 @@ void *merge_sort(void* ptr ) {
 
 
 		/***************** Starting of Thread One*********************/
-        pthread_t thread1;
+        int thread_id1, thread_id2;
 
-        merge_sort_args *new_args1 = new merge_sort_args();
+		merge_sort_args *new_args1 = new merge_sort_args();
         new_args1->a = args->a;
         new_args1->startPos = args->startPos;
         new_args1->endPos = mid;
 
-        pthread_create( &thread1, NULL, merge_sort, (void*) new_args1);
+        pthread_t thread1;
+		if( thread_count < 10){
+            thread_count++;
+            thread_id1 = pthread_create( &thread1, NULL, merge_sort, (void*) new_args1);
+        }else{
+            merge_sort(new_args1);
+        }
 		//merge_sort( a , startPos, mid);
 		/*****************End of Thread One*********************/
 
 		/***************** Starting of Thread Two *********************/
-        pthread_t thread2;
 
         merge_sort_args *new_args2 = new merge_sort_args();
         new_args2->a = args->a;
         new_args2->startPos = mid+1;
         new_args2->endPos = args->endPos;
 
-		pthread_create( &thread2, NULL, merge_sort, (void*) new_args2);
-		//merge_sort( a , mid + 1 , endPos);
-
+        pthread_t thread2;
+		if( thread_count < 10){
+            thread_count++;
+            thread_id2 = pthread_create( &thread2, NULL, merge_sort, (void*) new_args2);
+            //merge_sort( a , mid + 1 , endPos);
+        }else{
+            merge_sort(new_args2);
+        }
 		/*****************End of Thread Two *********************/
 		//Wait till the two threads finish their work
-        pthread_join( thread1, NULL);
-        pthread_join( thread2, NULL);
-
+		if ( thread_id1 != 0 ){
+            pthread_join( thread1, NULL);
+            thread_count--;
+        }
+        if( thread_id2 != 0 ){
+            pthread_join( thread2, NULL);
+            thread_count--;
+        }
+        ;
         //Merge the results
 		_merge(args->a , args->startPos , mid ,args->endPos);
     }

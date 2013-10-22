@@ -92,12 +92,12 @@ void *merge_sort(void* ptr ) {
         new_args1->endPos = mid;
 
         pthread_t thread1;
-		if( thread_count < 10){
+		//if( thread_count < 10){
             thread_count++;
             thread_id1 = pthread_create( &thread1, NULL, merge_sort, (void*) new_args1);
-        }else{
+        /*}else{
             merge_sort(new_args1);
-        }
+        }*/
 		//merge_sort( a , startPos, mid);
 		/*****************End of Thread One*********************/
 
@@ -109,24 +109,24 @@ void *merge_sort(void* ptr ) {
         new_args2->endPos = args->endPos;
 
         pthread_t thread2;
-		if( thread_count < 10){
+		//if( thread_count < 10){
             thread_count++;
             thread_id2 = pthread_create( &thread2, NULL, merge_sort, (void*) new_args2);
             //merge_sort( a , mid + 1 , endPos);
-        }else{
+        /*}else{
             merge_sort(new_args2);
-        }
+        }*/
 		/*****************End of Thread Two *********************/
 		//Wait till the two threads finish their work
-		if ( thread_id1 != 0 ){
+		//if ( thread_id1 != 0 ){
             pthread_join( thread1, NULL);
             thread_count--;
-        }
-        if( thread_id2 != 0 ){
+        //}
+        //if( thread_id2 != 0 ){
             pthread_join( thread2, NULL);
             thread_count--;
-        }
-        ;
+        //}
+
         //Merge the results
 		_merge(args->a , args->startPos , mid ,args->endPos);
     }
